@@ -1,0 +1,1 @@
+PYTHONPATH=`pwd` python src/run.py run --logname src/singlespeaker.lr0.000300.1.g4.b16 --out-label singlespeaker-out --r 4 --pool_size 2 --strides 2 --model spline --file resources/samples_msp_4_msp.2.4.lr.wav 

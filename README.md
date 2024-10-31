@@ -84,8 +84,10 @@ optional arguments:
   --sam SAM             subsampling factor for the data (only applicable for multispeaker data)
 ```
 
-The output of the data preparation step are two `.h5` archives containing, respectively, the training and validation pairs of high/low resolution sound patches.
+The output of the data preparation step are two `.h5` archives containing, respectively, the training and validation
+pairs of high/low resolution sound patches.
 You can also generate these by running `make` in the corresponding directory, e.g.
+
 ```
 cd ./speaker1;
 make;
@@ -94,6 +96,7 @@ make;
 This will use a set of default parameters.
 
 To generate the files needed for the training example below, run the following from the `speaker1` directory:
+
 ```
 python ../prep_vctk.py \
   --file-list  speaker1-train-files.txt \
@@ -145,7 +148,8 @@ python ../prep_vctk.py \
 We have included code to prepare two datasets.
 
 * The single-speaker dataset consists only of VCTK speaker #1; it is relatively quick to train a model (a few hours).
-* The multi-speaker dataset uses the last 8 VCTK speakers for evaluation, and the rest for training; it takes several days to train the model, and several hours to prepare the data.
+* The multi-speaker dataset uses the last 8 VCTK speakers for evaluation, and the rest for training; it takes several
+  days to train the model, and several hours to prepare the data.
 
 We suggest starting with the single-speaker dataset.
 
@@ -186,8 +190,9 @@ optional arguments:
                         is the snr acorss the non-patched data file, rather than the average snr over all the 
                         patches which is calculated by default
 ```
-Note: to generate the data needed for the grocery imputation experiment, download train.csv.7z from 
-https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data into the data/grocery/grocery directory, 
+
+Note: to generate the data needed for the grocery imputation experiment, download train.csv.7z from
+https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data into the data/grocery/grocery directory,
 unzip the csv, and run prep_grocery.py from the data/grocery directory.
 
 For example, to run the model on data prepared for the single speaker dataset, you would type:
@@ -214,7 +219,9 @@ The above run will store checkpoints in `./singlespeaker.lr0.000300.1.g4.b64`.
 Note on the models: audiotfilm is the best model.
 
 #### Pre-Trained Model
+
 See the below link for a pre-trained single-speaker model. This model was trained with the following parameters:
+
 ```
 python run.py train \
   --train ../data/vctk/speaker1/vctk-speaker1-train.4.16000.8192.4096.h5 \
@@ -226,7 +233,8 @@ python run.py train \
 
 https://drive.google.com/file/d/1pqIaxtZpt9GRc-Yp1zCzVoSbQFSLnERF/view?usp=sharing
 
-To use the model, unzip the file in the `src` directory and run eval with the logname corresponding to the checkpoint file.
+To use the model, unzip the file in the `src` directory and run eval with the logname corresponding to the checkpoint
+file.
 
 ### Testing the model
 
@@ -267,12 +275,18 @@ and create for each file `f.wav` three audio samples:
 * `f.singlespeaker-out.lr.wav`: the low resolution version processed by the model
 * `f.singlespeaker-out.pr.wav`: the super-resolved version
 
-These will be found in the same folder as `f.wav`. Because of how our model is defined, the number of samples in the input must be a multiple of `2**downscaling_layers`; if that's not the case, we will clip the input file (potentially shortening it by a fraction of a second).
+These will be found in the same folder as `f.wav`. Because of how our model is defined, the number of samples in the
+input must be a multiple of `2**downscaling_layers`; if that's not the case, we will clip the input file (potentially
+shortening it by a fraction of a second).
 
-**Disclaimer:** We recently upgraded the versions of many of the packages, including Keras and Tensorflow. The example workflow for training and predicting should work, but the codebase has not been fully tested. Please create an issue if you run into any errors.   
+**Disclaimer:** We recently upgraded the versions of many of the packages, including Keras and Tensorflow. The example
+workflow for training and predicting should work, but the codebase has not been fully tested. Please create an issue if
+you run into any errors.
 
 ### Keras Layer
-`keras_layer.py` implements the TFiLM layer as a customer Keras layer. The below code illustrates how to use this custom layer.
+
+`keras_layer.py` implements the TFiLM layer as a customer Keras layer. The below code illustrates how to use this custom
+layer.
 
 ```
 import numpy as np
@@ -305,14 +319,19 @@ model.fit(x, y, epochs=10)  # starts training
 
 We would like to emphasize a few points.
 
-* Machine learning algorithms are only as good as their training data. If you want to apply our method to your personal recordings, you will most likely need to collect additional labeled examples.
+* Machine learning algorithms are only as good as their training data. If you want to apply our method to your personal
+  recordings, you will most likely need to collect additional labeled examples.
 * You will need a very large model to fit large and diverse datasets (such as the 1M Songs Dataset)
-* Interestingly, super-resolution works better on aliased input (no low-pass filter). This is not reflected well in objective benchmarks, but is noticeable when listening to the samples. For applications like compression (where you control the low-res signal), this may be important.
-* More generally, the model is very sensitive to how low resolution samples are generated. Even the type of low-pass filter (Butterworth, Chebyshev) will affect performance.
+* Interestingly, super-resolution works better on aliased input (no low-pass filter). This is not reflected well in
+  objective benchmarks, but is noticeable when listening to the samples. For applications like compression (where you
+  control the low-res signal), this may be important.
+* More generally, the model is very sensitive to how low resolution samples are generated. Even the type of low-pass
+  filter (Butterworth, Chebyshev) will affect performance.
 
 ### Extensions
 
-The same architecture can be used on many time series tasks outside the audio domain. We have successfully used it to impute functional genomics data and denoise EEG recordings.
+The same architecture can be used on many time series tasks outside the audio domain. We have successfully used it to
+impute functional genomics data and denoise EEG recordings.
 
 ## Feedback
 

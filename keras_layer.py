@@ -1,6 +1,7 @@
 from keras import backend as K
 from keras.layers import Layer, LSTM, MaxPooling1D
 
+
 class TFiLM(Layer):
     """
     Input should be a tensor of shape (batch_size, steps, num_features)
@@ -18,14 +19,14 @@ class TFiLM(Layer):
         x_in_down = (MaxPooling1D(pool_size=self.block_size, padding='valid'))(x_in)
         x_rnn = self.rnn(x_in_down)
         return x_rnn
-      
+
     def apply_normalizer(self, x_in, x_norm):
         """
         Applies normalization weights by multiplying them into their respective blocks.
         """
         n_blocks = int(x_in.shape[1] / self.block_size)
-        n_filters = x_in.shape[2] 
-        
+        n_filters = x_in.shape[2]
+
         # reshape input into blocks
         x_norm = K.reshape(x_norm, shape=(-1, n_blocks, 1, n_filters))
         x_in = K.reshape(x_in, shape=(-1, n_blocks, self.block_size, n_filters))
@@ -38,9 +39,8 @@ class TFiLM(Layer):
 
         return x_out
 
-
     def build(self, input_shape):
-        self.rnn = LSTM(units = input_shape[2], return_sequences = True, trainable=True)
+        self.rnn = LSTM(units=input_shape[2], return_sequences=True, trainable=True)
         self.rnn.build(input_shape)
         self._trainable_weights = self.rnn.trainable_weights
         super(TFiLM, self).build(input_shape)

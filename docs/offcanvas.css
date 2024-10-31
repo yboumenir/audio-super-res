@@ -4,43 +4,46 @@
  */
 html,
 body {
-  overflow-x: hidden;  /*Prevent scroll on narrow devices */
-  padding-top: 30px;
+    overflow-x: hidden; /*Prevent scroll on narrow devices */
+    padding-top: 30px;
 }
+
 footer {
-  padding: 10px 0;
+    padding: 10px 0;
 }
+
 .container {
-  max-width: 768px;
+    max-width: 768px;
 }
 
 p {
-  font-size: 18px;
-  /*padding-bottom: 20px;*/
+    font-size: 18px;
+    /*padding-bottom: 20px;*/
 }
 
 li {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .jumbotron h2 {
-  font-size: 48px;
+    font-size: 48px;
 }
 
-.section { 
-  padding-top: 10px
+.section {
+    padding-top: 10px
 }
 
 .caption {
-  width:75%; 
-  font-size:14px
+    width: 75%;
+    font-size: 14px
 }
 
 audio {
-  width: 160px;
+    width: 160px;
 }
+
 .audio {
-  width: 160px;
-  float: left;
-  margin-right: 5px;
+    width: 160px;
+    float: left;
+    margin-right: 5px;
 }

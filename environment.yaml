@@ -9,11 +9,11 @@ dependencies:
   - cudnn=8.1.0
   - pip
   - pip:
-    - tensorflow==2.4.1
-    - keras==2.4.0
-    - numpy==1.19.5
-    - scipy==1.6.0
-    - librosa==0.8.1
-    - h5py==2.10.0
-    - matplotlib==3.3.4
-    - tqdm==4.58.0
+      - tensorflow==2.4.1
+      - keras==2.4.0
+      - numpy==1.19.5
+      - scipy==1.6.0
+      - librosa==0.8.1
+      - h5py==2.10.0
+      - matplotlib==3.3.4
+      - tqdm==4.58.0

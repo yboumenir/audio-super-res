@@ -37,7 +37,7 @@ class Model(object):
             X = tf.compat.v1.placeholder(tf.float32, shape=(None, None, 1), name='X')
             Y = tf.compat.v1.placeholder(tf.float32, shape=(None, None, 1), name='Y')
             alpha = tf.compat.v1.placeholder(tf.float32, shape=(),
-                                   name='alpha')  # weight multiplier
+                                             name='alpha')  # weight multiplier
             # save inputs
             self.inputs = (X, Y, alpha)
             tf.compat.v1.add_to_collection('inputs', X)
@@ -64,13 +64,13 @@ class Model(object):
     def get_power(self, x):
         S = librosa.stft(x, 2048)
         p = np.angle(S)
-        S = np.log(np.abs(S)**2 + 1e-8)
+        S = np.log(np.abs(S) ** 2 + 1e-8)
         return S
 
     def compute_log_distortion(self, x_hr, x_pr):
         S1 = self.get_power(x_hr)
         S2 = self.get_power(x_pr)
-        lsd = np.mean(np.sqrt(np.mean((S1-S2)**2 + 1e-8, axis=1)), axis=0)
+        lsd = np.mean(np.sqrt(np.mean((S1 - S2) ** 2 + 1e-8, axis=1)), axis=0)
         return min(lsd, 10.)
 
     def create_train_op(self, X, Y, alpha):
@@ -97,7 +97,7 @@ class Model(object):
         # initialize the optimizer variabLes
         optimizer_vars = [v for v in tf.compat.v1.global_variables() if 'optimizer/' in v.name
                           or 'Adam' in v.name]
-        #init = tf.variables_initializer(optimizer_vars)
+        # init = tf.variables_initializer(optimizer_vars)
         init = tf.compat.v1.initialize_all_variables()
         self.sess.run(init)
 
@@ -111,8 +111,8 @@ class Model(object):
         P = self.predictions
 
         # compute l2 loss
-        sqrt_l2_loss = tf.sqrt(tf.reduce_mean(input_tensor=(P-Y)**2 + 1e-6, axis=[1, 2]))
-        sqrn_l2_norm = tf.sqrt(tf.reduce_mean(input_tensor=Y**2, axis=[1, 2]))
+        sqrt_l2_loss = tf.sqrt(tf.reduce_mean(input_tensor=(P - Y) ** 2 + 1e-6, axis=[1, 2]))
+        sqrn_l2_norm = tf.sqrt(tf.reduce_mean(input_tensor=Y ** 2, axis=[1, 2]))
         snr = 20 * tf.math.log(sqrn_l2_norm / sqrt_l2_loss + 1e-8) / tf.math.log(10.)
 
         avg_sqrt_l2_loss = tf.reduce_mean(input_tensor=sqrt_l2_loss, axis=0)
@@ -157,7 +157,7 @@ class Model(object):
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         # update grads
-        grads = [alpha*g for g in grads]
+        grads = [alpha * g for g in grads]
 
         # use the optimizer to apply the gradients that minimize the loss
         gv = list(zip(grads, params))
@@ -195,19 +195,20 @@ class Model(object):
         self.train_op = tf.compat.v1.get_collection('train_op')
 
     def calc_snr(self, Y, Pred):
-        sqrt_l2_loss = np.sqrt(np.mean((Pred-Y)**2+1e-6, axis=(0, 1)))
-        sqrn_l2_norm = np.sqrt(np.mean(Y**2, axis=(0, 1)))
+        sqrt_l2_loss = np.sqrt(np.mean((Pred - Y) ** 2 + 1e-6, axis=(0, 1)))
+        sqrn_l2_norm = np.sqrt(np.mean(Y ** 2, axis=(0, 1)))
         snr = 20 * np.log(sqrn_l2_norm / sqrt_l2_loss + 1e-8) / np.log(10.)
         return snr
 
     def calc_snr2(self, Y, P):
-        sqrt_l2_loss = np.sqrt(np.mean((P-Y)**2 + 1e-6, axis=(1, 2)))
-        sqrn_l2_norm = np.sqrt(np.mean(Y**2, axis=(1, 2)))
+        sqrt_l2_loss = np.sqrt(np.mean((P - Y) ** 2 + 1e-6, axis=(1, 2)))
+        sqrn_l2_norm = np.sqrt(np.mean(Y ** 2, axis=(1, 2)))
         snr = 20 * np.log(sqrn_l2_norm / sqrt_l2_loss + 1e-8) / np.log(10.)
         avg_snr = np.mean(snr, axis=0)
         return avg_snr
 
-    def fit(self, X_train, Y_train, X_val, Y_val, n_epoch=100, r=4, speaker="single", grocery="false", piano="false", calc_full_snr=False):
+    def fit(self, X_train, Y_train, X_val, Y_val, n_epoch=100, r=4, speaker="single", grocery="false", piano="false",
+            calc_full_snr=False):
         # initialize log directory
         if tf.io.gfile.exists(self.logdir):
             tf.io.gfile.rmtree(self.logdir)
@@ -288,20 +289,20 @@ class Model(object):
 
                 # calcuate the full snr (currenty on each epoch)
                 full_snr = 0
-                if(calc_full_snr and train_data.epochs_completed % 1 == 0 and grocery == 'false'):
+                if (calc_full_snr and train_data.epochs_completed % 1 == 0 and grocery == 'false'):
                     s1 = ""
                     s2 = ""
                     if piano == "true":
                         s1 = "../piano/interp/full-"
                         s2 = "-piano-interp-val." + \
-                            str(r) + '.16000.-1.4096.0.1'
+                             str(r) + '.16000.-1.4096.0.1'
                     elif speaker == "single":
                         s1 = "../data/vctk/speaker1/full-"
                         s2 = "-vctk-speaker1-val." + str(r) + '.16000.-1.4096'
                     elif speaker == "multi":
                         s1 = "../data/vctk/multispeaker/full-"
                         s2 = "-vctk-multispeaker-interp-val." + \
-                            str(r) + '.16000.-1.8192.0.25'
+                             str(r) + '.16000.-1.8192.0.25'
                     full_clips_X = pickle.load(open(s1 + 'data' + s2, 'rb'))
                     full_clips_Y = pickle.load(open(s1 + 'label' + s2, 'rb'))
 
@@ -312,8 +313,8 @@ class Model(object):
                         Y = np.reshape(Y, (1, Y.shape[0], 1))
 
                         if self.__class__.__name__ == 'DNN':
-                            X = X[:, :8192*(X.shape[1]/8192), :]
-                            Y = Y[:, :8192*(Y.shape[1]/8192), :]
+                            X = X[:, :8192 * (X.shape[1] / 8192), :]
+                            Y = Y[:, :8192 * (Y.shape[1] / 8192), :]
 
                         __, snr, __ = self.eval_err(X, Y, 1)
                         full_snr += snr
@@ -363,7 +364,7 @@ class Model(object):
             tot_snr += l2_snr
             Ys = np.append(Ys, Y)
             Preds = np.append(Preds, P)
-            if(i < 10):
+            if (i < 10):
                 i += 1
                 d.append(P)
                 l.append(Y)
@@ -371,10 +372,11 @@ class Model(object):
         # calculate lsd
         lsd = self.compute_log_distortion(Ys, Preds)
 
-        return tot_l2_loss / (bn+1), tot_snr / (bn+1), lsd
+        return tot_l2_loss / (bn + 1), tot_snr / (bn + 1), lsd
 
     def predict(self, X):
         raise NotImplementedError()
+
 
 # ----------------------------------------------------------------------------
 # helpers
